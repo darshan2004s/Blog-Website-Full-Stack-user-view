@@ -57,7 +57,12 @@ export default function BlogPostCard({ post }: BlogPostCardProps) {
                 </div>
               )}
               
-              
+              {/* Category Badge */}
+              <div className="absolute top-4 right-4">
+                <span className={`px-3 py-1.5 text-xs font-bold uppercase tracking-wide rounded-full backdrop-blur-sm border border-white/20 ${getCategoryColor(post.category)}`}>
+                  {post.category}
+                </span>
+              </div>
 
               {/* Gradient overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>

@@ -10,9 +10,7 @@ interface SupabasePostRow {
   image_url: string | null;
   date: string;
   author: string | null;
-  categories: {
-    category_name: string;
-  }[] | null;
+  category_id: number | null; // Add this to fetch the category ID directly
 }
 
 interface SupabaseCategoryRow {
@@ -33,9 +31,7 @@ export async function getAllPosts(): Promise<BlogPost[]> {
       image_url,
       date,
       author,
-      categories (
-        category_name
-      )
+      category_id
     `)
     .order('post_id', { ascending: false });
 
@@ -44,16 +40,27 @@ export async function getAllPosts(): Promise<BlogPost[]> {
     return [];
   }
 
-  return (data || []).map((row: SupabasePostRow) => ({
-    id: String(row.post_id),
-    slug: row.post_slug,
-    title: row.post_title,
-    content: row.content,
-    category: row.categories?.[0]?.category_name || 'Uncategorized',
-    imageUrl: row.image_url || '',
-    date: row.date,
-    author: row.author || 'Unknown'
-  }));
+  const categories = await getAllCategories(); // Fetch all categories once
+
+  return (data || []).map((row: SupabasePostRow) => {
+    let categoryName = 'Uncategorized';
+    if (row.category_id) {
+      const foundCategory = categories.find(cat => Number(cat.id) === row.category_id);
+      if (foundCategory) {
+        categoryName = foundCategory.name;
+      }
+    }
+    return {
+      id: String(row.post_id),
+      slug: row.post_slug,
+      title: row.post_title,
+      content: row.content,
+      category: categoryName,
+      imageUrl: row.image_url || '',
+      date: row.date,
+      author: row.author || 'Unknown'
+    };
+  });
 }
 
 // Get a single post by slug
@@ -68,9 +75,7 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
       image_url,
       date,
       author,
-      categories (
-        category_name
-      )
+      category_id
     `)
     .eq('post_slug', slug)
     .single();
@@ -84,12 +89,21 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
     return null;
   }
 
+  let categoryName = 'Uncategorized';
+  if (data.category_id) {
+    const categories = await getAllCategories(); // Fetch all categories
+    const foundCategory = categories.find(cat => Number(cat.id) === data.category_id);
+    if (foundCategory) {
+      categoryName = foundCategory.name;
+    }
+  }
+
   return {
     id: String(data.post_id),
     slug: data.post_slug,
     title: data.post_title,
     content: data.content,
-    category: data.categories?.[0]?.category_name || 'Uncategorized',
+    category: categoryName, // Use the fetched category name
     imageUrl: data.image_url || '',
     date: data.date,
     author: data.author || 'Unknown'
@@ -145,9 +159,7 @@ export async function getPostsByCategory(categoryId: string): Promise<BlogPost[]
       image_url,
       date,
       author,
-      categories (
-        category_name
-      )
+      category_id
     `)
     .eq('category_id', categoryId)
     .order('post_id', { ascending: false });
@@ -157,14 +169,25 @@ export async function getPostsByCategory(categoryId: string): Promise<BlogPost[]
     return [];
   }
 
-  return (data || []).map((row: SupabasePostRow) => ({
-    id: String(row.post_id),
-    slug: row.post_slug,
-    title: row.post_title,
-    content: row.content,
-    category: row.categories?.[0]?.category_name || 'Uncategorized',
-    imageUrl: row.image_url || '',
-    date: row.date,
-    author: row.author || 'Unknown'
-  }));
+  const categories = await getAllCategories(); // Fetch all categories once
+
+  return (data || []).map((row: SupabasePostRow) => {
+    let categoryName = 'Uncategorized';
+    if (row.category_id) {
+      const foundCategory = categories.find(cat => Number(cat.id) === row.category_id);
+      if (foundCategory) {
+        categoryName = foundCategory.name;
+      }
+    }
+    return {
+      id: String(row.post_id),
+      slug: row.post_slug,
+      title: row.post_title,
+      content: row.content,
+      category: categoryName,
+      imageUrl: row.image_url || '',
+      date: row.date,
+      author: row.author || 'Unknown'
+    };
+  });
 }
