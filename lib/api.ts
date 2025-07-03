@@ -56,6 +56,60 @@ export async function getAllPosts(): Promise<BlogPost[]> {
   }));
 }
 
+// Get a single post by slug
+export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
+  const { data, error } = await supabase
+    .from('posts')
+    .select(`
+      post_id,
+      post_slug,
+      post_title,
+      content,
+      image_url,
+      date,
+      author,
+      categories (
+        category_name
+      )
+    `)
+    .eq('post_slug', slug)
+    .single();
+
+  if (error) {
+    console.error(`Error fetching post with slug ${slug}:`, error);
+    return null;
+  }
+
+  if (!data) {
+    return null;
+  }
+
+  return {
+    id: String(data.post_id),
+    slug: data.post_slug,
+    title: data.post_title,
+    content: data.content,
+    category: data.categories?.[0]?.category_name || 'Uncategorized',
+    imageUrl: data.image_url || '',
+    date: data.date,
+    author: data.author || 'Unknown'
+  };
+}
+
+// Get all post slugs for static path generation
+export async function getAllPostSlugs(): Promise<string[]> {
+  const { data, error } = await supabase
+    .from('posts')
+    .select('post_slug');
+
+  if (error) {
+    console.error('Error fetching post slugs:', error);
+    return [];
+  }
+
+  return (data || []).map((row: { post_slug: string }) => row.post_slug);
+}
+
 // Get all categories
 export async function getAllCategories(): Promise<Category[]> {
   const { data, error } = await supabase

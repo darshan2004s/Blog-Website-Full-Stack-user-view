@@ -2,26 +2,33 @@ import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { BlogPost } from '@/types';
-import { getAllPosts } from '@/lib/api';
+import { getPostBySlug, getAllPostSlugs, getAllPosts } from '@/lib/api';
+
+export const revalidate = 60; // Revalidate every 60 seconds
+
+export async function generateStaticParams() {
+  const slugs = await getAllPostSlugs();
+  return slugs.map((slug) => ({ slug }));
+}
 
 export default async function BlogPostPage({
   params,
 }: {
   params: { slug: string };
 }) {
-  const posts: BlogPost[] = await getAllPosts();
-  const post = posts.find((p) => p.slug === params.slug);
+  const post = await getPostBySlug(params.slug);
 
   if (!post) {
     notFound();
   }
 
-  const relatedPosts = posts
+  const allPosts = await getAllPosts(); // Fetch all posts for related posts logic
+  const relatedPosts = allPosts
     .filter((p) => p.slug !== params.slug && p.category === post.category)
     .slice(0, 4);
 
   if (relatedPosts.length < 4) {
-    const otherPosts = posts
+    const otherPosts = allPosts
       .filter((p) => p.slug !== params.slug && p.category !== post.category)
       .slice(0, 4 - relatedPosts.length);
     relatedPosts.push(...otherPosts);

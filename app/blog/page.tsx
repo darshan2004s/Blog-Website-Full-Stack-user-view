@@ -2,6 +2,8 @@ import { getAllPosts } from '@/lib/api';
 import { BlogPost } from '@/types';
 import BlogPostsClient from '@/components/BlogPostsClient';
 
+export const revalidate = 60; // Revalidate every 60 seconds
+
 export default async function BlogListPage() {
   const posts: BlogPost[] = await getAllPosts();
 

@@ -3,6 +3,8 @@ import { getPostsByCategory, getAllCategories } from '@/lib/api';
 import { BlogPost, Category } from '@/types';
 import { notFound } from 'next/navigation';
 
+export const revalidate = 60; // Revalidate every 60 seconds
+
 export async function generateStaticParams() {
   const categories: Category[] = await getAllCategories();
   return categories.map((category) => ({ categorySlug: category.slug }));

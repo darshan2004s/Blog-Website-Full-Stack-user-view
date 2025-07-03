@@ -2,6 +2,8 @@ import CategoryCard from '@/components/CategoryCard';
 import { getAllCategories } from '@/lib/api';
 import { Category } from '@/types';
 
+export const revalidate = 60; // Revalidate every 60 seconds
+
 export default async function CategoriesListPage() {
   const categories: Category[] = await getAllCategories();
 
