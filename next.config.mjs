@@ -1,6 +1,6 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
+// next.config.mjs
+/** @type {import('next').NextConfig} */ // JSDoc for type checking in JS
+const nextConfig = {
   /* config options here */
   webpack: (config, { isServer }) => {
     if (!isServer) {
@@ -15,4 +15,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default nextConfig; // Use export default for ES Modules

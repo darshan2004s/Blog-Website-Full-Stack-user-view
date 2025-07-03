@@ -49,7 +49,7 @@ export default function BlogPostsClient({ initialPosts }: BlogPostsClientProps) 
 
       <input
   type="text"
-  placeholder="Search articles, topics, or keywords..."
+  placeholder="Search articles, topics, or keywords&hellip;"
   value={searchTerm}
   onChange={(e) => setSearchTerm(e.target.value)}
   className="w-full

@@ -1,10 +1,6 @@
 'use client';
 
-import { useTheme } from '@/lib/ThemeContext';
-
 export default function AboutUsPage() {
-  const { theme, toggleTheme } = useTheme();
-
   return (
     <div className="min-h-screen flex items-center justify-center">
       {/* Glassmorphism background overlay */}
@@ -19,10 +15,6 @@ export default function AboutUsPage() {
         <div className="text-center py-16 max-w-3xl mx-auto w-full">
           {/* Glass container */}
           <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-3xl p-12 shadow-2xl text-white">
-            {/* Theme Toggle Button */}
-            <div className="flex justify-end mb-6">
-              
-            </div>
 
             <h1 className="text-6xl md:text-7xl font-extrabold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-6 leading-tight">
               About My Simple Blog

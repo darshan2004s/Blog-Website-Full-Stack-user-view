@@ -4,7 +4,7 @@ import './globals.css'; // Make sure this path is correct based on your structur
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { SearchProvider } from '@/lib/SearchContext';
-import { ThemeProvider } from '@/lib/ThemeContext';
+
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -21,12 +21,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} flex flex-col min-h-screen`}>
-        <ThemeProvider>
+        
           <SearchProvider>
             <Header />
               {children}
           </SearchProvider>
-        </ThemeProvider>
+        
         <Footer />
       </body>
     </html>

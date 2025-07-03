@@ -9,21 +9,21 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.50.2",
     "knex": "^3.1.0",
     "lucide-react": "^0.523.0",
-    "mysql2": "^3.14.1",
     "net": "^1.0.2",
-    "next": "15.3.3",
+    "next": "^14.2.3",
     "pg": "^8.16.2",
     "pg-query-stream": "^4.10.2",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "tls": "^0.0.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
+    "@types/node": "^20.19.2",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",

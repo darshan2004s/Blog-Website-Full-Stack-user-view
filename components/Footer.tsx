@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 
 export default function Footer() {
   return (
@@ -37,7 +38,7 @@ export default function Footer() {
             <h4 className="text-lg font-semibold text-white">Quick Links</h4>
             <ul className="space-y-2">
               <li><a href="/about-us" className="text-gray-300 hover:text-white transition-colors text-sm">About Us</a></li>
-              <li><a href="/categories" className="text-gray-300 hover:text-white transition-colors text-sm">Categories</a></li>
+              <li><Link href="/categories" className="text-gray-300 hover:text-white transition-colors text-sm">Categories</Link></li>
               <li><a href="/contact" className="text-gray-300 hover:text-white transition-colors text-sm">Contact</a></li>
               <li><a href="/privacy" className="text-gray-300 hover:text-white transition-colors text-sm">Privacy Policy</a></li>
             </ul>

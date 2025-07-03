@@ -95,7 +95,7 @@ export default function BlogPostCard({ post }: BlogPostCardProps) {
                   </div>
                   <div>
                     <div className="font-semibold text-slate-700 text-sm">{post.author || 'Anonymous'}</div>
-                    <div className="text-xs text-slate-500">{formatDate(post.createdAt || post.date)}</div>
+                    <div className="text-xs text-slate-500">{formatDate(post.date)}</div>
                   </div>
                 </div>
 

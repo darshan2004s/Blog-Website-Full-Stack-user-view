@@ -4,7 +4,7 @@ export type BlogPost = {
   title: string;
   content: string;
   category: string;
-  date: Date;
+  date: string;
   imageUrl: string;
   author: string;
 };

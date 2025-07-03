@@ -4,11 +4,11 @@ import Link from 'next/link';
 import { BlogPost } from '@/types';
 import { getAllPosts } from '@/lib/api';
 
-interface BlogPostPageProps {
+export default async function BlogPostPage({
+  params,
+}: {
   params: { slug: string };
-}
-
-export default async function BlogPostPage({ params }: BlogPostPageProps) {
+}) {
   const posts: BlogPost[] = await getAllPosts();
   const post = posts.find((p) => p.slug === params.slug);
 

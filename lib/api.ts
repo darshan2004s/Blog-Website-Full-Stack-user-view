@@ -1,112 +1,116 @@
-import db from './db';
+// lib/api.ts
+import { supabase } from './supabaseClient';
 import { BlogPost, Category } from '@/types';
 
-// Get all posts with author and category
-export async function getAllPosts(): Promise<BlogPost[]> {
-  console.log('Attempting to fetch posts from database...');
-
-  const [rows] = await db.query(`
-    SELECT 
-      p.post_id AS id,
-      p.post_slug AS slug,
-      p.post_title AS title,
-      p.content,
-      COALESCE(c.category_name, 'Uncategorized') AS category,
-      p.image_url AS imageUrl,
-      p.date,
-      p.author
-    FROM posts p
-    LEFT JOIN categories c ON p.category_id = c.category_id
-    ORDER BY p.post_id DESC
-  `);
-
-  console.log('Raw database rows:', rows);
-
-  const posts = (rows as any[]).map((row: any) => {
-    const post = {
-      id: String(row.id || row.post_id),
-      slug: row.slug || row.post_slug || `post-${row.id}`,
-      title: row.title || row.post_title || 'Untitled Post',
-      content: row.content || '',
-      category: row.category || 'Uncategorized',
-      imageUrl: row.imageUrl || row.image_url || null,
-      date: row.date,
-      author: row.author || 'Unknown'
-    };
-    console.log(`Post ID: ${post.id}, Title: ${post.title}, Image URL: ${post.imageUrl}`); // Added log
-    return post;
-  });
-
-  return posts;
+interface SupabasePostRow {
+  post_id: number;
+  post_slug: string;
+  post_title: string;
+  content: string;
+  image_url: string | null;
+  date: string;
+  author: string | null;
+  categories: {
+    category_name: string;
+  }[] | null;
 }
 
-// Simpler fallback version, if category join is unavailable
-export async function getAllPostsSimple(): Promise<BlogPost[]> {
-  try {
-    const [rows] = await db.query('SELECT * FROM posts ORDER BY post_id DESC');
-    console.log('Simple query result:', rows);
+interface SupabaseCategoryRow {
+  category_id: number;
+  category_name: string;
+  category_slug: string;
+}
 
-    return (rows as any[]).map((row: any) => ({
-      id: String(row.post_id),
-      title: row.post_title || 'Untitled',
-      slug: row.post_slug || `post-${row.post_id}`,
-      category: 'Technology', // default category name
-      content: row.content || '',
-      imageUrl: row.image_url,
-      date: row.date,
-      author: row.author || 'Unknown'
-    }));
-  } catch (error) {
-    console.error('Simple query failed:', error);
-    throw error;
+// Get all posts with joined category name
+export async function getAllPosts(): Promise<BlogPost[]> {
+  const { data, error } = await supabase
+    .from('posts')
+    .select(`
+      post_id,
+      post_slug,
+      post_title,
+      content,
+      image_url,
+      date,
+      author,
+      categories (
+        category_name
+      )
+    `)
+    .order('post_id', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching posts:', error);
+    return [];
   }
+
+  return (data || []).map((row: SupabasePostRow) => ({
+    id: String(row.post_id),
+    slug: row.post_slug,
+    title: row.post_title,
+    content: row.content,
+    category: row.categories?.[0]?.category_name || 'Uncategorized',
+    imageUrl: row.image_url || '',
+    date: row.date,
+    author: row.author || 'Unknown'
+  }));
 }
 
 // Get all categories
 export async function getAllCategories(): Promise<Category[]> {
-  const [rows] = await db.query(`
-    SELECT 
-      category_id AS id,
-      category_slug AS slug,
-      category_name AS name
-    FROM categories
-    ORDER BY category_name
-  `);
+  const { data, error } = await supabase
+    .from('categories')
+    .select(`
+      category_id,
+      category_name,
+      category_slug
+    `)
+    .order('category_name', { ascending: true });
 
-  return rows as Category[];
+  if (error) {
+    console.error('Error fetching categories:', error);
+    return [];
+  }
+
+  return (data || []).map((row: SupabaseCategoryRow) => ({
+    id: String(row.category_id),
+    name: row.category_name,
+    slug: row.category_slug
+  }));
 }
 
 // Get posts by category ID
 export async function getPostsByCategory(categoryId: string): Promise<BlogPost[]> {
-  try {
-    const [rows] = await db.query(`
-      SELECT 
-        p.post_id AS id,
-        p.post_slug AS slug,
-        p.post_title AS title,
-        p.content,
-        COALESCE(c.category_name, 'Uncategorized') AS category,
-        p.image_url AS imageUrl,
-        p.date,
-        p.author
-      FROM posts p
-      LEFT JOIN categories c ON p.category_id = c.category_id
-      WHERE p.category_id = ?
-      ORDER BY p.post_id DESC
-    `, [categoryId]);
+  const { data, error } = await supabase
+    .from('posts')
+    .select(`
+      post_id,
+      post_slug,
+      post_title,
+      content,
+      image_url,
+      date,
+      author,
+      categories (
+        category_name
+      )
+    `)
+    .eq('category_id', categoryId)
+    .order('post_id', { ascending: false });
 
-    return (rows as any[]).map((row: any) => ({
-      id: String(row.id || row.post_id),
-      slug: row.slug || row.post_slug || `post-${row.id}`,
-      title: row.title || row.post_title || 'Untitled Post',
-      content: row.content || '',
-      category: row.category || 'Uncategorized',
-      imageUrl: row.imageUrl || row.image_url || null,
-      date: row.date,
-      author: row.author || 'Unknown'
-    }));
-  } catch (error) {
+  if (error) {
     console.error('Error fetching posts by category:', error);
-    throw error;
+    return [];
   }
+
+  return (data || []).map((row: SupabasePostRow) => ({
+    id: String(row.post_id),
+    slug: row.post_slug,
+    title: row.post_title,
+    content: row.content,
+    category: row.categories?.[0]?.category_name || 'Uncategorized',
+    imageUrl: row.image_url || '',
+    date: row.date,
+    author: row.author || 'Unknown'
+  }));
 }
